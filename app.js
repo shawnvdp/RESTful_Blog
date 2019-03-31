@@ -21,6 +21,12 @@ let blogSchema = new mongoose.Schema({
 //mongoose model config
 let Blog = mongoose.model("Blog", blogSchema);
 
+// Blog.create({
+//     title: "Test Blog",
+//     image: "https://i.imgur.com/xFVjwbl.jpg",
+//     body: "This is a test blog body"
+// });
+
 //RESTFUL ROUTES
 
 app.get("/", function(req, res){
