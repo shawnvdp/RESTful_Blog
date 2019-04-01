@@ -31,14 +31,33 @@ let Blog = mongoose.model("Blog", blogSchema);
 
 app.get("/", function(req, res){
     res.redirect("blogs");
-})
+});
 
+//INDEX ROUTE
 app.get("/blogs", function(req, res){
     Blog.find({}, function(err, blogs){ //find all entries in our database, handle err/results in callback function
         if (err){
             console.log("ERROR");
         } else{
             res.render("index", {blogs: blogs}); //pass blog results into index.ejs, calling it 'blogs'
+        }
+    });
+});
+
+//NEW ROUTE
+app.get("/blogs/new", function(req, res){
+    res.render("new");
+});
+
+//CREATE
+app.post("/blogs", function(req, res){
+    //grab the form data from the request's body
+    let formData = req.body.blog;
+    Blog.create(formData, function(err, newBlog){
+        if (err){
+            res.render("new");
+        } else{
+            res.redirect("/blogs");
         }
     });
 });
