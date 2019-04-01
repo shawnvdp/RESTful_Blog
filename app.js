@@ -62,6 +62,20 @@ app.post("/blogs", function(req, res){
     });
 });
 
+//SHOW
+app.get("/blogs/:id", function(req, res){
+    //grab the ':id' field from the url inside req.params
+    let blogID = req.params.id;
+    //search the database and grab matching _id entry
+    Blog.findById(blogID, function(err, foundBlog){
+        if (err){
+            res.redirect("index");
+        } else{
+            res.render("show", {blog: foundBlog});
+        }
+    })
+});
+
 
 //serve server on port 3000
 app.listen(3000, function(){
