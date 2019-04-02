@@ -1,7 +1,8 @@
-let bodyParser  = require("body-parser"),
-mongoose        = require("mongoose"),
-express         = require("express"),
-app             = express();
+let methodOverride  = require("method-override"),
+bodyParser          = require("body-parser"),
+mongoose            = require("mongoose"),
+express             = require("express"),
+app                 = express();
 
 //create local mongodb if it doesn't exist, otherwise use it
 mongoose.connect("mongodb://localhost/restful_blog", {useNewUrlParser: true});
@@ -10,6 +11,7 @@ mongoose.connect("mongodb://localhost/restful_blog", {useNewUrlParser: true});
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(methodOverride("_method")); //configure the string Method_Override looks for (put/delete requests)
 
 //define a schema that the blog post entries will follow
 let blogSchema = new mongoose.Schema({
@@ -74,6 +76,32 @@ app.get("/blogs/:id", function(req, res){
             res.render("show", {blog: foundBlog});
         }
     })
+});
+
+//EDIT
+app.get("/blogs/:id/edit", function(req, res){
+    let blogID = req.params.id;
+    Blog.findById(blogID, function(err, foundBlog){
+        if (err){
+            res.redirect("/blogs");
+        } else{
+            res.render("edit", {blog: foundBlog});
+        }
+    });
+});
+
+//UPDATE
+app.put("/blogs/:id", function(req, res){
+    let blogID = req.params.id;
+    //lookup matching entry and update in 1 method
+    Blog.findByIdAndUpdate(blogID, req.body.blog, function(err, updatedBlog){
+        if (err){
+            res.redirect("/blogs");
+        } else{
+            //redirect to blog's SHOW page
+            res.redirect("/blogs/" + blogID);
+        }
+    });
 });
 
 
