@@ -104,6 +104,19 @@ app.put("/blogs/:id", function(req, res){
     });
 });
 
+//DELETE
+app.delete("/blogs/:id", function(req, res){
+    let blogID = req.params.id;
+    //lookup matching entry and delete in 1 method
+    Blog.findByIdAndDelete(blogID, function(err){
+        if (err){
+            res.redirect("/blogs");
+        } else{
+            res.redirect("/blogs");
+        }
+    });
+});
+
 
 //serve server on port 3000
 app.listen(3000, function(){
