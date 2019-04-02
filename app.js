@@ -1,8 +1,9 @@
-let methodOverride  = require("method-override"),
-bodyParser          = require("body-parser"),
-mongoose            = require("mongoose"),
-express             = require("express"),
-app                 = express();
+let expressSanitizer    = require("express-sanitizer"),
+methodOverride          = require("method-override"),
+bodyParser              = require("body-parser"),
+mongoose                = require("mongoose"),
+express                 = require("express"),
+app                     = express();
 
 //create local mongodb if it doesn't exist, otherwise use it
 mongoose.connect("mongodb://localhost/restful_blog", {useNewUrlParser: true});
@@ -11,6 +12,7 @@ mongoose.connect("mongodb://localhost/restful_blog", {useNewUrlParser: true});
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(expressSanitizer()); //must go after bodyParser
 app.use(methodOverride("_method")); //configure the string Method_Override looks for (put/delete requests)
 
 //define a schema that the blog post entries will follow
@@ -23,14 +25,7 @@ let blogSchema = new mongoose.Schema({
 //mongoose model config
 let Blog = mongoose.model("Blog", blogSchema);
 
-// Blog.create({
-//     title: "Test Blog",
-//     image: "https://i.imgur.com/xFVjwbl.jpg",
-//     body: "This is a test blog body"
-// });
-
-//RESTFUL ROUTES
-
+//ROOT
 app.get("/", function(req, res){
     res.redirect("blogs");
 });
@@ -55,6 +50,7 @@ app.get("/blogs/new", function(req, res){
 app.post("/blogs", function(req, res){
     //grab the form data from the request's body
     let formData = req.body.blog;
+    req.body.blog.body = req.sanitize(req.body.blog.body); //req.body = form data, blog.body = 'name' attribute object, set that equal to sanitized version of current(strip script tags)
     Blog.create(formData, function(err, newBlog){
         if (err){
             res.render("new");
@@ -93,6 +89,7 @@ app.get("/blogs/:id/edit", function(req, res){
 //UPDATE
 app.put("/blogs/:id", function(req, res){
     let blogID = req.params.id;
+    req.body.blog.body = req.sanitize(req.body.blog.body); //req.body = form data, blog.body = 'name' attribute object, set that equal to sanitized version of current(strip script tags)
     //lookup matching entry and update in 1 method
     Blog.findByIdAndUpdate(blogID, req.body.blog, function(err, updatedBlog){
         if (err){

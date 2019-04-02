@@ -7,6 +7,10 @@ i.icon{
     margin-top: 7em;
 }
 
+.break-word {
+    word-wrap: break-word;
+  }
+
 #delete{
     display: inline;
 }

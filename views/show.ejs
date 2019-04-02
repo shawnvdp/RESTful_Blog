@@ -9,7 +9,7 @@
                 <span><%= blog.created.toDateString() %></span>
             </div>
             <div class="description">
-                <p><%- blog.body %></p>
+                <p class="break-word"><%- blog.body %></p> <!-- Evaluate blog.body, interpreting possible HTML tags typed by the user as actual HTML code -->
             </div>
             <a class="ui black basic button" href="/blogs">Back</a>
             <a class="ui blue basic button" href="/blogs/<%= blog._id %>/edit">Edit</a>

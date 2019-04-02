@@ -10,14 +10,13 @@
         <div class="field">
             <label for="">Image</label>
             <input type="text" name="blog[image]" value="<%= blog.image %>">
-            
         </div>
         <div class="field">
             <label for="">Blog Content</label>
             <textarea name="blog[body]"><%= blog.body %></textarea>
         </div>
         <div class="field">
-            <a class="ui black big basic button" href="/blogs">Back</a>
+            <a class="ui black big basic button" href="/blogs/<%= blog._id %>">Back</a>
             <button class="ui purple big basic button" type="submit">Submit</button>
         </div>
     </form>
