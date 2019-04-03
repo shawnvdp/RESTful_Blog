@@ -3,6 +3,9 @@ methodOverride          = require("method-override"),
 bodyParser              = require("body-parser"),
 mongoose                = require("mongoose"),
 express                 = require("express"),
+seedDB                  = require("./seeds"),
+Blog                    = require("./models/blog"),
+comments                = require("./models/comment"),
 app                     = express();
 
 //create local mongodb if it doesn't exist, otherwise use it
@@ -12,18 +15,12 @@ mongoose.connect("mongodb://localhost/restful_blog", {useNewUrlParser: true});
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(expressSanitizer()); //must go after bodyParser
-app.use(methodOverride("_method")); //configure the string Method_Override looks for (put/delete requests)
-
-//define a schema that the blog post entries will follow
-let blogSchema = new mongoose.Schema({
-    title: String,
-    image: String,
-    body: String,
-    created: {type: Date, default: Date.now} //data type 'Date' with the current date as default value
-});
-//mongoose model config
-let Blog = mongoose.model("Blog", blogSchema);
+//must go after bodyParser
+app.use(expressSanitizer());
+//configure the string Method_Override looks for (put/delete requests)
+app.use(methodOverride("_method"));
+//execute the imported seedDB function (removes all, then populates blogs/comments)
+seedDB();
 
 //ROOT
 app.get("/", function(req, res){
@@ -32,11 +29,13 @@ app.get("/", function(req, res){
 
 //INDEX ROUTE
 app.get("/blogs", function(req, res){
-    Blog.find({}, function(err, blogs){ //find all entries in our database, handle err/results in callback function
+    //find all entries in our database, handle err/results in callback function
+    Blog.find({}, function(err, blogs){
         if (err){
             console.log("ERROR");
         } else{
-            res.render("index", {blogs: blogs}); //pass blog results into index.ejs, calling it 'blogs'
+            //pass blog results into index.ejs, calling it 'blogs'
+            res.render("index", {blogs: blogs});
         }
     });
 });
@@ -50,7 +49,8 @@ app.get("/blogs/new", function(req, res){
 app.post("/blogs", function(req, res){
     //grab the form data from the request's body
     let formData = req.body.blog;
-    req.body.blog.body = req.sanitize(req.body.blog.body); //req.body = form data, blog.body = 'name' attribute object, set that equal to sanitized version of current(strip script tags)
+    //req.body = form data, blog.body = 'name' attribute object, set that equal to sanitized version of current(strip script tags)
+    req.body.blog.body = req.sanitize(req.body.blog.body);
     Blog.create(formData, function(err, newBlog){
         if (err){
             res.render("new");
@@ -64,10 +64,11 @@ app.post("/blogs", function(req, res){
 app.get("/blogs/:id", function(req, res){
     //grab the ':id' field from the url inside req.params
     let blogID = req.params.id;
-    //search the database and grab matching _id entry
-    Blog.findById(blogID, function(err, foundBlog){
+    //populate the comments array holding Comment _id references, .exec to actually exec the query
+    Blog.findById(blogID).populate("comments").exec(function(err, foundBlog){
         if (err){
             res.redirect("index");
+            console.log(err);
         } else{
             res.render("show", {blog: foundBlog});
         }
@@ -89,7 +90,8 @@ app.get("/blogs/:id/edit", function(req, res){
 //UPDATE
 app.put("/blogs/:id", function(req, res){
     let blogID = req.params.id;
-    req.body.blog.body = req.sanitize(req.body.blog.body); //req.body = form data, blog.body = 'name' attribute object, set that equal to sanitized version of current(strip script tags)
+    //req.body = form data, blog.body = 'name' attribute object, set that equal to sanitized version of current(strip script tags)
+    req.body.blog.body = req.sanitize(req.body.blog.body);
     //lookup matching entry and update in 1 method
     Blog.findByIdAndUpdate(blogID, req.body.blog, function(err, updatedBlog){
         if (err){

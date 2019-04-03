@@ -9,13 +9,18 @@
                 <span><%= blog.created.toDateString() %></span>
             </div>
             <div class="description">
-                <p class="break-word"><%- blog.body %></p> <!-- Evaluate blog.body, interpreting possible HTML tags typed by the user as actual HTML code -->
+                <!-- Evaluate blog.body, interpreting possible HTML tags typed by the user as actual HTML code (- not =) -->
+                <p class="break-word"><%- blog.body %></p>
             </div>
             <a class="ui black basic button" href="/blogs">Back</a>
             <a class="ui blue basic button" href="/blogs/<%= blog._id %>/edit">Edit</a>
             <form id="delete" action="/blogs/<%= blog._id %>?_method=DELETE" method="POST">
                 <button class="ui red basic button" type="submit">Delete</button>
             </form>
+            <!-- create a paragraph for each comment the blog's comments[] holds -->
+            <% blog.comments.forEach(function(comment){ %>
+                <p><strong><%= comment.author %></strong> - <%= comment.text %></p>
+            <% })%>
         </div>
     </div>
 </div>
