@@ -1,4 +1,4 @@
-<% include ./partials/header.ejs %>
+<% include ../partials/header.ejs %>
 
 <div class="ui main text container segment">
     <div class="ui huge header"><%= blog.title %></div>
@@ -17,6 +17,9 @@
             <form id="delete" action="/blogs/<%= blog._id %>?_method=DELETE" method="POST">
                 <button class="ui red basic button" type="submit">Delete</button>
             </form>
+            <p>
+                <a class="ui green basic button" href="/blogs/<%= blog._id %>/comments/new">Add New Comment</a>
+            </p>
             <!-- create a paragraph for each comment the blog's comments[] holds -->
             <% blog.comments.forEach(function(comment){ %>
                 <p><strong><%= comment.author %></strong> - <%= comment.text %></p>
@@ -25,4 +28,4 @@
     </div>
 </div>
 
-<% include ./partials/footer.ejs %>
+<% include ../partials/footer.ejs %>

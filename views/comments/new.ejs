@@ -1,0 +1,22 @@
+<% include ../partials/header.ejs %>
+
+<div class="ui main text container segment">
+    <div class="ui huge header">Add New Comment To <%= blog.title %></div>
+    <form class="ui form" action="/blogs/<%= blog._id %>/comments" method="POST">
+        <div class="field">
+            <label for="">Author</label>
+            <input type="text" name="comment[author]" placeholder="author">
+        </div>
+        <div class="field">
+            <label for="">Comment</label>
+            <input type="text" name="comment[text]" placeholder="comment text">
+        </div>
+        <div class="field">
+            <a class="ui black big basic button" href="/blogs/<%= blog._id %>">Back</a>
+            <button class="ui purple big basic button" type="submit">Submit</button>
+        </div>
+    </form>
+</div>
+
+
+<% include ../partials/footer.ejs %>
