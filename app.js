@@ -15,7 +15,7 @@ mongoose.connect("mongodb://localhost/restful_blog", {
 
 //express setup
 app.set("view engine", "ejs");
-app.use(express.static("public"));
+app.use(express.static(__dirname + "/public"));
 app.use(
 	bodyParser.urlencoded({
 		extended: true
@@ -50,7 +50,7 @@ app.get("/blogs", function(req, res) {
 
 //NEW ROUTE
 app.get("/blogs/new", function(req, res) {
-	res.render("/blogs/new");
+	res.render("blogs/new");
 });
 
 //CREATE
